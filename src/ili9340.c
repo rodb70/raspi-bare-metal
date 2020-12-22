@@ -2,6 +2,10 @@
 #include "bcm2835.h"
 #include "ili9340.h"
 
+#define ILI_CMD_PIN 20
+#define ILI_LED_PIN 18
+#define ILI_RST_PIN 19
+
 uint16_t width;
 uint16_t height;
 uint8_t rotation;
@@ -17,9 +21,9 @@ void ili9340_write_command(uint8_t command, int param_len, ...)
 	char buffer[50];
 	va_list args;
 
-	bcm2835_gpio_write(25, LOW);
+	bcm2835_gpio_write(ILI_CMD_PIN, LOW);
 	bcm2835_spi_transfer(command);
-	bcm2835_gpio_write(25, HIGH);
+	bcm2835_gpio_write(ILI_CMD_PIN, HIGH);
 
 	if (param_len) {
 		va_start(args, param_len);
@@ -185,7 +189,14 @@ void ili9340_init(void)
 	bcm2835_spi_setDataMode(BCM2835_SPI_MODE0);                  
 	bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_64); 
 	bcm2835_spi_chipSelect(BCM2835_SPI_CS0);
-	bcm2835_gpio_fsel(25, BCM2835_GPIO_FSEL_OUTP); 
+	bcm2835_gpio_fsel(ILI_CMD_PIN, BCM2835_GPIO_FSEL_OUTP); 
+	bcm2835_gpio_fsel(ILI_LED_PIN, BCM2835_GPIO_FSEL_OUTP); 
+	bcm2835_gpio_fsel(ILI_RST_PIN, BCM2835_GPIO_FSEL_OUTP); 
+
+	bcm2835_gpio_write(ILI_RST_PIN, HIGH);
+	bcm2835_delay(120);
+
+    bcm2835_gpio_write(ILI_LED_PIN, HIGH);
 
 	ili9340_write_command(0xEF, 3, 0x03, 0x80, 0x02);
 	ili9340_write_command(0xCF, 3, 0x00 , 0XC1 , 0X30);

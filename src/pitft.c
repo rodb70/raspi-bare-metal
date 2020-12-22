@@ -2,6 +2,11 @@
 #include "ili9340.h"
 #include "raycasting.h"
 
+#define UP 0
+#define DOWN 1
+#define LEFT 2
+#define RIGHT 3
+
 void draw_vert_line(int x, int y, int h, int color_mode)
 {
 	if (color_mode) {
@@ -25,19 +30,19 @@ int run(void)
 	init_world(screen_width, screen_height);
 	cast_rays(draw_vert_line, ili9340_update_display); 
 
-	bcm2835_gpio_fsel(22, BCM2835_GPIO_FSEL_INPT); 
-	bcm2835_gpio_fsel(23, BCM2835_GPIO_FSEL_INPT); 
-	bcm2835_gpio_fsel(21, BCM2835_GPIO_FSEL_INPT); 
-	bcm2835_gpio_fsel(18, BCM2835_GPIO_FSEL_INPT); 
-	bcm2835_gpio_set_pud(22, BCM2835_GPIO_PUD_UP);
-	bcm2835_gpio_set_pud(23, BCM2835_GPIO_PUD_UP);
-	bcm2835_gpio_set_pud(21, BCM2835_GPIO_PUD_UP);
-	bcm2835_gpio_set_pud(18, BCM2835_GPIO_PUD_UP);
+	bcm2835_gpio_fsel(UP, BCM2835_GPIO_FSEL_INPT); 
+	bcm2835_gpio_fsel(DOWN, BCM2835_GPIO_FSEL_INPT); 
+	bcm2835_gpio_fsel(LEFT, BCM2835_GPIO_FSEL_INPT); 
+	bcm2835_gpio_fsel(RIGHT, BCM2835_GPIO_FSEL_INPT); 
+	bcm2835_gpio_set_pud(UP, BCM2835_GPIO_PUD_UP);
+	bcm2835_gpio_set_pud(DOWN, BCM2835_GPIO_PUD_UP);
+	bcm2835_gpio_set_pud(LEFT, BCM2835_GPIO_PUD_UP);
+	bcm2835_gpio_set_pud(RIGHT, BCM2835_GPIO_PUD_UP);
 
-	int pin22_state = 1;
-	int pin23_state = 1;
-	int pin21_state = 1;
-	int pin18_state = 1;
+	int pinUP_state = 1;
+	int pinDOWN_state = 1;
+	int pinLEFT_state = 1;
+	int pinRIGHT_state = 1;
 
 	// init LED 
 	bcm2835_gpio_fsel(16, BCM2835_GPIO_FSEL_OUTP); 
@@ -52,36 +57,36 @@ int run(void)
 		*/
 
 		bcm2835_aux_muart_transfernb("in the loop");
-		if (!bcm2835_gpio_lev(23) && pin23_state) {
-			pin23_state = 0;
+		if (!bcm2835_gpio_lev(DOWN) && pinDOWN_state) {
+			pinDOWN_state = 0;
 			player.rot_dir = 1.;
-			bcm2835_aux_muart_transfernb("23 - left");
-		} else if (bcm2835_gpio_lev(23) && !pin23_state) {
-			pin23_state = 1;
+			bcm2835_aux_muart_transfernb("DOWN - left");
+		} else if (bcm2835_gpio_lev(DOWN) && !pinDOWN_state) {
+			pinDOWN_state = 1;
 		}
 
-		if (!bcm2835_gpio_lev(22) && pin22_state) {
-			pin22_state = 0;
+		if (!bcm2835_gpio_lev(UP) && pinUP_state) {
+			pinUP_state = 0;
 			player.move_dir = 1.;
-			bcm2835_aux_muart_transfernb("22 - up");
-		} else if (!bcm2835_gpio_lev(22) && !pin22_state) {
-			pin22_state = 1;
+			bcm2835_aux_muart_transfernb("UP - up");
+		} else if (!bcm2835_gpio_lev(UP) && !pinUP_state) {
+			pinUP_state = 1;
 		}
 
-		if (!bcm2835_gpio_lev(21) && pin21_state) {
-			pin21_state = 0;
+		if (!bcm2835_gpio_lev(LEFT) && pinLEFT_state) {
+			pinLEFT_state = 0;
 			player.move_dir = -1.;
-			bcm2835_aux_muart_transfernb("21 - down");
-		} else if (!bcm2835_gpio_lev(21) && !pin21_state) {
-			pin21_state = 1;
+			bcm2835_aux_muart_transfernb("LEFT - down");
+		} else if (!bcm2835_gpio_lev(LEFT) && !pinLEFT_state) {
+			pinLEFT_state = 1;
 		}
 
-		if (!bcm2835_gpio_lev(18)) {
-			pin18_state = 0;
+		if (!bcm2835_gpio_lev(RIGHT)) {
+			pinRIGHT_state = 0;
 			player.rot_dir = -1.;
-			bcm2835_aux_muart_transfernb("18 - right");
-		} else if (!bcm2835_gpio_lev(18) && !pin18_state) {
-			pin18_state = 1;
+			bcm2835_aux_muart_transfernb("RIGHT - right");
+		} else if (!bcm2835_gpio_lev(RIGHT) && !pinRIGHT_state) {
+			pinRIGHT_state = 1;
 		}
 
 		move_player();
