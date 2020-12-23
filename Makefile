@@ -15,6 +15,7 @@ LNK_SCR := link.ld
 include makefiles/main.mk
 
 EXTRA_LIBS += -lm
+BLD_OPTOMISE := -Os
 
 distclean:
 	rm -rf build

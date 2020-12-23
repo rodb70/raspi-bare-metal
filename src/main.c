@@ -6,11 +6,11 @@
 #include "pitft.h"
 #elif defined(FB)
 #include "fb.h"
-#else 
+#else
 #include "fb.h"
 #endif
 
 int main(void)
 {
-	return run();
+    return run();
 }
