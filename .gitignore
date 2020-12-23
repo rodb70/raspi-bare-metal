@@ -24,3 +24,4 @@ game
 kernel.list
 kernel.map
 *.swp
+/.settings/

@@ -10,7 +10,7 @@ uint16_t width;
 uint16_t height;
 uint8_t rotation;
 
-char framebuffer[2 * ILI9340_TFTWIDTH * ILI9340_TFTHEIGHT];
+uint16_t framebuffer[ILI9340_TFTWIDTH * ILI9340_TFTHEIGHT];
 uint16_t dirty_x0;
 uint16_t dirty_y0;
 uint16_t dirty_x1;
@@ -27,7 +27,7 @@ void ili9340_write_command(uint8_t command, int param_len, ...)
 
 	if (param_len) {
 		va_start(args, param_len);
-		for (uint32_t i = 0; i < param_len; i++) {
+		for (int i = 0; i < param_len; i++) {
 			buffer[i] = (uint8_t)va_arg(args, int);
 		}
 		va_end(args);
@@ -53,7 +53,7 @@ void ili9340_set_addr_window(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 	ili9340_write_command(ILI9340_RAMWR, 0);
 }
 
-void ili9340_draw_pixel(uint16_t x, uint16_t y, uint16_t color) 
+void ili9340_draw_pixel(uint16_t x, uint16_t y, uint16_t color)
 {
 	if (x >= width) x = width - 1;
 	if (y >= height) y = height - 1;
@@ -86,13 +86,13 @@ void ili9340_fill_rect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t 
 	}
 }
 
-void ili9340_draw_line_v(uint16_t x, uint16_t y, uint16_t h, uint16_t color) 
+void ili9340_draw_line_v(uint16_t x, uint16_t y, uint16_t h, uint16_t color)
 {
 	ili9340_fill_rect(x, y, 1, h, color);
 }
 
 
-void ili9340_draw_line_h(uint16_t x, uint16_t y, uint16_t w, uint16_t color) 
+void ili9340_draw_line_h(uint16_t x, uint16_t y, uint16_t w, uint16_t color)
 {
 	ili9340_fill_rect(x, y, w, 1, color);
 }
@@ -105,7 +105,7 @@ void ili9340_mkdirty(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 	if (y1 > dirty_y1) dirty_y1 = y1;
 }
 
-void ili9340_update_display()
+void ili9340_update_display(void)
 {
 	if (dirty_x0 >= width || dirty_x1 >= width ||
 			dirty_y0 >= height || dirty_y1 >= height) {
@@ -129,7 +129,7 @@ void ili9340_update_display()
 	uint32_t len = 2 * (dirty_x1 - dirty_x0 + 1);
 
 	while (dirty_y0 <= dirty_y1) {
-		bcm2835_spi_writenb(framebuffer + offset, len);
+		bcm2835_spi_writenb((void*)(framebuffer + offset), len);
 		offset += width << 1;
 		dirty_y0++;
 	}
@@ -140,17 +140,17 @@ void ili9340_update_display()
 	dirty_y1 = 0;
 }
 
-uint16_t ili9340_get_width()
+uint16_t ili9340_get_width(void)
 {
 	return width;
 }
 
-uint16_t ili9340_get_height()
+uint16_t ili9340_get_height(void)
 {
 	return height;
 }
 
-void ili9340_set_rotation(uint8_t m) 
+void ili9340_set_rotation(uint8_t m)
 {
 	rotation = m % 4; // can't be higher than 3
 	switch (rotation) {
@@ -170,7 +170,7 @@ void ili9340_set_rotation(uint8_t m)
 			height = ILI9340_TFTHEIGHT;
 			break;
 		case 3:
-			ili9340_write_command(ILI9340_MADCTL, 1, ILI9340_MADCTL_MV | ILI9340_MADCTL_MY 
+			ili9340_write_command(ILI9340_MADCTL, 1, ILI9340_MADCTL_MV | ILI9340_MADCTL_MY
 					| ILI9340_MADCTL_MX | ILI9340_MADCTL_BGR);
 			width  = ILI9340_TFTHEIGHT;
 			height = ILI9340_TFTWIDTH;
@@ -186,12 +186,12 @@ void ili9340_set_rotation(uint8_t m)
 void ili9340_init(void)
 {
 	bcm2835_spi_begin();
-	bcm2835_spi_setDataMode(BCM2835_SPI_MODE0);                  
-	bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_64); 
+	bcm2835_spi_setDataMode(BCM2835_SPI_MODE0);
+	bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_64);
 	bcm2835_spi_chipSelect(BCM2835_SPI_CS0);
-	bcm2835_gpio_fsel(ILI_CMD_PIN, BCM2835_GPIO_FSEL_OUTP); 
-	bcm2835_gpio_fsel(ILI_LED_PIN, BCM2835_GPIO_FSEL_OUTP); 
-	bcm2835_gpio_fsel(ILI_RST_PIN, BCM2835_GPIO_FSEL_OUTP); 
+	bcm2835_gpio_fsel(ILI_CMD_PIN, BCM2835_GPIO_FSEL_OUTP);
+	bcm2835_gpio_fsel(ILI_LED_PIN, BCM2835_GPIO_FSEL_OUTP);
+	bcm2835_gpio_fsel(ILI_RST_PIN, BCM2835_GPIO_FSEL_OUTP);
 
 	bcm2835_gpio_write(ILI_RST_PIN, HIGH);
 	bcm2835_delay(120);

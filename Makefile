@@ -1,24 +1,20 @@
-all: fb
+# Makefile
 
-sdl:
-	@echo "*** Preparing SDL executable. ***"
-	make -f sdl.make
-	@echo "*** Run ./game ***"
+CROSS_COMPILE := /opt/gcc-arm-none-eabi-6-2017-q1-update/bin/arm-none-eabi-
 
-qemu:
-	@echo "*** Preparing QEMU kernel image. ***"
-	make -f raspi.make qemu
-	@echo "*** Run make runqemu ***"
+COMPILER := gcc
 
-runqemu:
-	make -f raspi.make runqemu
+CPU := rpi1
+BLD_TARGET := raycast
+BLD_TYPE := debug
 
-pitft:
-	@echo "*** Preparing image for Adafruit TFT panel. ***"
-	make -f raspi.make pitft
-	@echo "*** Copy kernel.img to SD card. ***"
+PROJ_DIRS := src
 
-fb:
-	@echo "*** Preparing image for Raspberry Pi framebuffer. ***"
-	make -f raspi.make fb
-	@echo "*** Copy kernel.img to SD card. ***"
+LNK_SCR := link.ld
+
+include makefiles/main.mk
+
+EXTRA_LIBS += -lm
+
+distclean:
+	rm -rf build
