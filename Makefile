@@ -16,6 +16,7 @@ include makefiles/main.mk
 
 EXTRA_LIBS += -lm
 BLD_OPTOMISE := -Os
+CFLAGS += -DI2C_V1=1
 
 distclean:
 	rm -rf build

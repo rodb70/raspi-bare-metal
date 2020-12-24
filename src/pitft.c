@@ -2,10 +2,10 @@
 #include "ili9340.h"
 #include "raycasting.h"
 
-#define UP 0
-#define DOWN 1
-#define LEFT 2
-#define RIGHT 3
+#define UP 7
+#define DOWN 16
+#define LEFT 26
+#define RIGHT 17
 
 void draw_vert_line(int x, int y, int h, int color_mode)
 {
@@ -47,19 +47,8 @@ int run(void)
     int pinLEFT_state = 1;
     int pinRIGHT_state = 1;
 
-    // init LED
-    bcm2835_gpio_fsel( 16, BCM2835_GPIO_FSEL_OUTP );
-
     while( 1 )
     {
-        // LED blinking
-/*
-        bcm2835_gpio_write(16, HIGH);
-        bcm2835_delayMicroseconds(20000);
-        bcm2835_gpio_write(16, LOW);
-        bcm2835_delayMicroseconds(20000);
-        */
-
         bcm2835_aux_muart_transfernb( "in the loop" );
         if( !bcm2835_gpio_lev( DOWN ) && pinDOWN_state )
         {
