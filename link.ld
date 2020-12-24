@@ -24,8 +24,8 @@ SECTIONS
     }
     
     /* 
-    * Next we put the data.
-    */
+     * Next we put the data.
+     */
     .data : {
         . = ALIGN( 4 );
         *(.data*)
