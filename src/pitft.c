@@ -1,6 +1,7 @@
 #include "bcm2835.h"
 #include "ili9340.h"
 #include "raycasting.h"
+#include "mmu.h"
 
 #define UP 7
 #define DOWN 16
@@ -21,6 +22,12 @@ void draw_vert_line(int x, int y, int h, int color_mode)
 
 int run(void)
 {
+    /* Setup translation tables with Core 0 */
+    MmuSetupPagetable();
+
+    /* setup mmu on core 0 */
+    MmuEnable();
+
     bcm2835_init();
     bcm2835_aux_muart_init();
 

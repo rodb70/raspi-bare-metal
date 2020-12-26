@@ -40,14 +40,16 @@ endif
 #-----------------------------------------------------------------------------
 # Declare C files
 CSRC += bcm2835.c
-#CSRC += fb.c
 CSRC += ili9340.c
 CSRC += main.c
 CSRC += pitft.c
-#CSRC += qemu.c
 CSRC += raycasting.c
+CSRC += mmu.c
+
+# Other non-baremetal operational modes 
+#CSRC += fb.c
+#CSRC += qemu.c
 #CSRC += sdl.c
-CSRC += 
 
 CFLAGS += -DPITFT=1
 
